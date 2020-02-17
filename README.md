@@ -1,7 +1,7 @@
 # paramParse
 用于http.Request 集中解析参数， 并返回错误
 
-##Exmaple
+## Exmaple
 ```
 func Hello(w http.ResponseWriter, r *http.Request)  {
 	var (
