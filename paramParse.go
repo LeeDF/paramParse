@@ -226,9 +226,9 @@ func getInt64(unk interface{}) (val int64, err error) {
 
 	switch i := unk.(type) {
 	case float64:
-		return 0, errors.New("Can't convert float64 to int64")
+		return int64(i), nil
 	case float32:
-		return 0, errors.New("Can't convert float32 to int64")
+		return int64(i), nil
 	case int64:
 		return i, nil
 	case int32:
@@ -256,9 +256,9 @@ func getUInt64(unk interface{}) (val uint64, err error) {
 
 	switch i := unk.(type) {
 	case float64:
-		return 0, errors.New("Can't convert float64 to int64")
+		return uint64(i), nil
 	case float32:
-		return 0, errors.New("Can't convert float32 to int64")
+		return uint64(i), nil
 	case int64:
 		if i < 0 {
 			return 0, errors.New("< 0")
@@ -295,9 +295,9 @@ func getInt32(unk interface{}) (val int32, err error) {
 	var i64 int64
 	switch i := unk.(type) {
 	case float64:
-		return 0, errors.New("Can't convert float to int")
+		return int32(i),nil
 	case float32:
-		return 0, errors.New("Can't convert float to int")
+		return int32(i),nil
 	case int64:
 		s := strconv.FormatInt(i, 10)
 		i64, err = strconv.ParseInt(s, 0, 32)
@@ -334,9 +334,9 @@ func getUInt32(unk interface{}) (val uint32, err error) {
 	var tmp uint64
 	switch i := unk.(type) {
 	case float64:
-		return 0, errors.New("Can't convert float64 to int")
+		return uint32(i),nil
 	case float32:
-		return 0, errors.New("Can't convert float32 to int")
+		return uint32(i),nil
 	case int64:
 		if i < 0 {
 			return 0, errors.New("< 0")
@@ -381,9 +381,9 @@ func getInt(unk interface{}) (val int, err error) {
 
 	switch i := unk.(type) {
 	case float64:
-		return 0, errors.New("Can't convert float64 to int64")
+		return int(i),nil
 	case float32:
-		return 0, errors.New("Can't convert float32 to int64")
+		return int(i),nil
 	case int64:
 		s := strconv.FormatInt(i, 10)
 		i64, err := strconv.ParseInt(s, 0, strconv.IntSize)
