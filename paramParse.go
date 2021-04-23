@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	"reflect"
 	"strconv"
 	"unsafe"
 )
@@ -183,6 +184,56 @@ func (p *Parser) Float64Val(ptr *float64, name string, defaultVal interface{}) {
 	p.mParam[name] = &Param{name: name, ptr: unsafe.Pointer(ptr), ty: FLOAT64, defaultValue: defaultVal}
 }
 
+func (p *ParseRequest) StructVal(ptr interface{}) {
+	p.ParseData()
+	d := reflect.ValueOf(ptr).Elem()
+	p.reflectVal(d)
+}
+
+func (p *Parser) reflectVal(d reflect.Value) {
+	for i := 0; i < d.NumField(); i++ {
+		var ok bool
+		var val interface{}
+		name := d.Type().Field(i).Tag.Get("json")
+		if len(name) == 0 {
+			name = d.Type().Field(i).Name
+		}
+		if val, ok = p.mData[name]; !ok {
+
+		}
+		switch d.Field(i).Kind() {
+		case reflect.Struct:
+			p.reflectVal(d.Field(i))
+		case reflect.Int:
+			if val != nil {
+				if val2, err := getInt64(val); err == nil {
+					d.Field(i).SetInt(val2)
+				}
+			}
+		case reflect.Uint:
+			if val != nil {
+				if val2, err := getUInt64(val); err == nil {
+					d.Field(i).SetUint(val2)
+				}
+			}
+
+		case reflect.String:
+			if val != nil {
+				if val2, err := getString(val); err == nil {
+					d.Field(i).SetString(val2)
+				}
+			}
+		case reflect.Float64:
+			if val != nil {
+				if val2, err := getFloat64(val); err == nil {
+					d.Field(i).SetFloat(val2)
+				}
+			}
+
+		}
+	}
+}
+
 func getFloat64(unk interface{}) (float64, error) {
 	//var floatType = reflect.TypeOf(float64(0))
 	//var stringType = reflect.TypeOf("")
@@ -243,7 +294,7 @@ func getInt64(unk interface{}) (val int64, err error) {
 		return int64(i), nil
 	case string:
 		if unk == "" {
-			return 0,nil
+			return 0, nil
 		}
 		return strconv.ParseInt(i, 0, 64)
 	default:
@@ -282,7 +333,7 @@ func getUInt64(unk interface{}) (val uint64, err error) {
 		return uint64(i), nil
 	case string:
 		if unk == "" {
-			return 0,nil
+			return 0, nil
 		}
 		return strconv.ParseUint(i, 0, 64)
 	default:
@@ -295,9 +346,9 @@ func getInt32(unk interface{}) (val int32, err error) {
 	var i64 int64
 	switch i := unk.(type) {
 	case float64:
-		return int32(i),nil
+		return int32(i), nil
 	case float32:
-		return int32(i),nil
+		return int32(i), nil
 	case int64:
 		s := strconv.FormatInt(i, 10)
 		i64, err = strconv.ParseInt(s, 0, 32)
@@ -320,7 +371,7 @@ func getInt32(unk interface{}) (val int32, err error) {
 		return int32(i64), err
 	case string:
 		if unk == "" {
-			return 0,nil
+			return 0, nil
 		}
 		i64, err = strconv.ParseInt(i, 0, 32)
 		return int32(i64), err
@@ -334,9 +385,9 @@ func getUInt32(unk interface{}) (val uint32, err error) {
 	var tmp uint64
 	switch i := unk.(type) {
 	case float64:
-		return uint32(i),nil
+		return uint32(i), nil
 	case float32:
-		return uint32(i),nil
+		return uint32(i), nil
 	case int64:
 		if i < 0 {
 			return 0, errors.New("< 0")
@@ -367,7 +418,7 @@ func getUInt32(unk interface{}) (val uint32, err error) {
 		return uint32(i), nil
 	case string:
 		if unk == "" {
-			return 0,nil
+			return 0, nil
 		}
 		tmp, err = strconv.ParseUint(i, 0, 32)
 		return uint32(tmp), nil
@@ -381,9 +432,9 @@ func getInt(unk interface{}) (val int, err error) {
 
 	switch i := unk.(type) {
 	case float64:
-		return int(i),nil
+		return int(i), nil
 	case float32:
-		return int(i),nil
+		return int(i), nil
 	case int64:
 		s := strconv.FormatInt(i, 10)
 		i64, err := strconv.ParseInt(s, 0, strconv.IntSize)
@@ -410,7 +461,7 @@ func getInt(unk interface{}) (val int, err error) {
 		return int(i), nil
 	case string:
 		if unk == "" {
-			return 0,nil
+			return 0, nil
 		}
 		return strconv.Atoi(i)
 	default:

@@ -20,6 +20,11 @@ func TestParser(t *testing.T) {
 		P.SetMData(k, v)
 	}
 
+	type StructP struct {
+		S1      string  `json:"s1"`
+		Int     int     `json:"int"`
+		Float64 float64 `json:"float64"`
+	}
 	var (
 		s1   string
 		i    int
@@ -27,11 +32,14 @@ func TestParser(t *testing.T) {
 		ui32 uint32
 		fl64 float64
 	)
+	st := StructP{}
+
 	P.StringVal(&s1, "s1", nil)
 	P.IntVal(&i, "int", nil)
 	P.Int32Val(&i32, "int32", nil)
 	P.Uint32Val(&ui32, "uint32", nil)
 	P.Float64Val(&fl64, "float64", nil)
+	P.StructVal(&st)
 	if ok := P.DoParse(); !ok {
 		t.Errorf("ParseError:%s", P.Err.Error())
 	}
@@ -50,6 +58,9 @@ func TestParser(t *testing.T) {
 	if fl64 != 1.2 {
 		t.Errorf("float64 error")
 	}
+
+	t.Log(st)
+
 }
 
 func TestParser_defaultVal(t *testing.T) {
